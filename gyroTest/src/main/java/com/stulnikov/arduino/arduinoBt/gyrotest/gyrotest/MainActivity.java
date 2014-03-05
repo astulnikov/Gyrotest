@@ -19,12 +19,15 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private static final int AXIS_Y = 1;
     private static final int AXIS_Z = 2;
 
-    SensorManager mSensorManager;
-    Sensor mAccelerometerSensor;
+    private SensorManager mSensorManager;
+    private Sensor mAccelerometerSensor;
 
-    TextView mXValueText;
-    TextView mYValueText;
-    TextView mZValueText;
+    private int mAverageAngle;
+
+    private TextView mXValueText;
+    private TextView mYValueText;
+    private TextView mZValueText;
+    private TextView mAngleValueText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,10 +71,10 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         Log.i(TAG, "Sensor Accuracy: " + event.accuracy);
         switch (event.sensor.getType()) {
             case Sensor.TYPE_ACCELEROMETER:
-                mXValueText.setText(String.format("%1f", event.values[AXIS_X] * 10));
-                mYValueText.setText(String.format("%1f", event.values[AXIS_Y] * 10));
-                mZValueText.setText(String.format("%1f", event.values[AXIS_Z] * 10));
-
+                mXValueText.setText(String.format("%1.2f", event.values[AXIS_X]));
+                mYValueText.setText(String.format("%1.2f", event.values[AXIS_Y]));
+                mZValueText.setText(String.format("%1.2f", event.values[AXIS_Z]));
+                setAngle((int) event.values[AXIS_Y] * 10);
 //                mXValueText.setText(String.format("%1.3f", event.values[AXIS_X]));
 //                mYValueText.setText(String.format("%1.3f", event.values[AXIS_Y]));
 //                mZValueText.setText(String.format("%1.3f", event.values[AXIS_Z]));
@@ -88,11 +91,18 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         mXValueText = (TextView) findViewById(R.id.value_x);
         mYValueText = (TextView) findViewById(R.id.value_y);
         mZValueText = (TextView) findViewById(R.id.value_z);
+        mAngleValueText = (TextView) findViewById(R.id.angle_value);
     }
 
 
     private void initSensors() {
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+    }
+
+    private void setAngle(int angle) {
+        mAverageAngle = (mAverageAngle + angle) / 2;
+        mAngleValueText.setText(mAverageAngle + " deg.");
+        int angleToSend = 90 + mAverageAngle;
     }
 }
