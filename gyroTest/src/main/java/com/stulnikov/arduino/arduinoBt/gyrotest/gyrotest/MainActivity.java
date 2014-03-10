@@ -31,6 +31,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private TextView mYValueText;
     private TextView mZValueText;
     private TextView mAngleValueText;
+    private TextView mArduinoDataTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +122,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         mYValueText = (TextView) findViewById(R.id.value_y);
         mZValueText = (TextView) findViewById(R.id.value_z);
         mAngleValueText = (TextView) findViewById(R.id.angle_value);
+        mArduinoDataTextView = (TextView) findViewById(R.id.arduino_data);
     }
 
 
@@ -139,20 +141,24 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     @Override
     public void onBlueToothReady() {
         Log.d(TAG, "BlueTooth Ready");
+        mArduinoDataTextView.setText("BlueTooth Ready");
     }
 
     @Override
     public void onDeviceConnected() {
         Log.d(TAG, "Device Connected");
+        mArduinoDataTextView.setText("Device Connected");
     }
 
     @Override
     public void onDeviceDisconnected() {
         Log.d(TAG, "Device Disconnected");
+        mArduinoDataTextView.setText("Device Disconnected");
     }
 
     @Override
     public void onDataReceived(String data) {
         Log.d(TAG, "Data Received: " + data);
+        mArduinoDataTextView.setText("Data Received: \" + data");
     }
 }
