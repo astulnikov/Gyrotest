@@ -86,4 +86,11 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:textSize="20sp"/>
+
+    <TextView
+        android:id="@+id/arduino_data"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/angle_value"
+        android:layout_centerHorizontal="true"/>
 </RelativeLayout>
