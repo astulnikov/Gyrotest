@@ -1,6 +1,7 @@
 package com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest;
 
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -12,12 +13,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-public class MainActivity extends ActionBarActivity implements SensorEventListener {
+public class MainActivity extends ActionBarActivity implements SensorEventListener, BlueToothManager.BlueToothManagerListener {
 
     public static final String TAG = "GyroTest";
     private static final int AXIS_X = 0;
     private static final int AXIS_Y = 1;
     private static final int AXIS_Z = 2;
+
+    private BlueToothSyncManager mBlueToothManager;
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometerSensor;
@@ -35,6 +38,13 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         setContentView(R.layout.activity_main);
         initViews();
         initSensors();
+        mBlueToothManager = new BlueToothSyncManager(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mBlueToothManager.start();
     }
 
     @Override
@@ -51,6 +61,12 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         //говорим что данные будем получать из этого окласса
         mSensorManager.unregisterListener(this);
         super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mBlueToothManager.stop();
     }
 
     @Override
@@ -87,6 +103,19 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == BlueToothManager.REQUEST_ENABLE_BT) {
+            if (resultCode == RESULT_OK) {
+                mBlueToothManager = new BlueToothSyncManager(this);
+                mBlueToothManager.start();
+            } else {
+                onDeviceDisconnected();
+            }
+        }
+    }
+
     private void initViews() {
         mXValueText = (TextView) findViewById(R.id.value_x);
         mYValueText = (TextView) findViewById(R.id.value_y);
@@ -104,5 +133,26 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         mAverageAngle = (mAverageAngle + angle) / 2;
         mAngleValueText.setText(mAverageAngle + " deg.");
         int angleToSend = 90 + mAverageAngle;
+        mBlueToothManager.safeSendData(String.valueOf(angleToSend));
+    }
+
+    @Override
+    public void onBlueToothReady() {
+        Log.d(TAG, "BlueTooth Ready");
+    }
+
+    @Override
+    public void onDeviceConnected() {
+        Log.d(TAG, "Device Connected");
+    }
+
+    @Override
+    public void onDeviceDisconnected() {
+        Log.d(TAG, "Device Disconnected");
+    }
+
+    @Override
+    public void onDataReceived(String data) {
+        Log.d(TAG, "Data Received: " + data);
     }
 }
