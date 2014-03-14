@@ -145,7 +145,7 @@ public class BlueToothManager {
     private class ConnectedThread extends Thread {
         private final BluetoothSocket copyBtSocket;
         private final OutputStream outStrem;
-        private final InputStream inStrem;
+        private final InputStream inStream;
 
         public ConnectedThread(BluetoothSocket socket) {
             copyBtSocket = socket;
@@ -159,7 +159,7 @@ public class BlueToothManager {
             }
 
             outStrem = tmpOut;
-            inStrem = tmpIn;
+            inStream = tmpIn;
         }
 
         public void run() {
@@ -168,8 +168,10 @@ public class BlueToothManager {
 
             while (true) {
                 try {
-                    bytes = inStrem.read(buffer);
-                    mMessageHandler.obtainMessage(ARDUINO_DATA, bytes, -1, buffer).sendToTarget();
+                    if (inStream.available() > 1) {
+                        bytes = inStream.read(buffer);
+                        mMessageHandler.obtainMessage(ARDUINO_DATA, bytes, -1, buffer).sendToTarget();
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                     mActivity.runOnUiThread(new Runnable() {
