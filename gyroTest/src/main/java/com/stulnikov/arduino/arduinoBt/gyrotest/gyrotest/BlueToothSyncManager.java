@@ -39,7 +39,7 @@ public class BlueToothSyncManager extends BlueToothManager {
     }
 
     public void safeSendData(String data) {
-        if (!mSendInProgress) {
+        if (isIsConnected() && !mSendInProgress) {
             mSendInProgress = true;
             attemptSend(data);
         }
