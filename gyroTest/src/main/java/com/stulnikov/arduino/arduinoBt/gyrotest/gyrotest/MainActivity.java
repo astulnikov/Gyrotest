@@ -11,6 +11,9 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class MainActivity extends ActionBarActivity implements SensorEventListener, BlueToothManager.BlueToothManagerListener {
@@ -32,6 +35,9 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private TextView mZValueText;
     private TextView mAngleValueText;
     private TextView mArduinoDataTextView;
+    private View mContentLayout;
+    private ProgressBar mProgressBar;
+    private Button mRetryButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +52,9 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     protected void onStart() {
         super.onStart();
         mBlueToothManager.start();
+        mContentLayout.setVisibility(View.GONE);
+        mRetryButton.setVisibility(View.GONE);
+        mProgressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -118,11 +127,23 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     }
 
     private void initViews() {
+        mContentLayout = findViewById(R.id.content_layout);
         mXValueText = (TextView) findViewById(R.id.value_x);
         mYValueText = (TextView) findViewById(R.id.value_y);
         mZValueText = (TextView) findViewById(R.id.value_z);
         mAngleValueText = (TextView) findViewById(R.id.angle_value);
         mArduinoDataTextView = (TextView) findViewById(R.id.arduino_data);
+        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        mRetryButton = (Button) findViewById(R.id.retry);
+        mRetryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Retry");
+                mBlueToothManager.start();
+                mRetryButton.setVisibility(View.GONE);
+                mProgressBar.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
 
@@ -148,12 +169,19 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     public void onDeviceConnected() {
         Log.d(TAG, "Device Connected");
         mArduinoDataTextView.setText("Device Connected");
+        mProgressBar.setVisibility(View.GONE);
+        mRetryButton.setVisibility(View.GONE);
+        mContentLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onDeviceDisconnected() {
         Log.d(TAG, "Device Disconnected");
         mArduinoDataTextView.setText("Device Disconnected");
+        mProgressBar.setVisibility(View.GONE);
+        mContentLayout.setVisibility(View.GONE);
+        mRetryButton.setVisibility(View.VISIBLE);
+
     }
 
     @Override

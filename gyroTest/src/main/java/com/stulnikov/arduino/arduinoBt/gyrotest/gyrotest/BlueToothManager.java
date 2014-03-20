@@ -31,7 +31,7 @@ public class BlueToothManager {
     private BluetoothAdapter btAdapter = null;
     private BluetoothSocket btSocket = null;
 
-    private boolean mIsConnected;
+    private boolean mConnected;
 
     public BlueToothManager(Activity activity) {
         mActivity = activity;
@@ -53,6 +53,10 @@ public class BlueToothManager {
         };
     }
 
+    public boolean isConnected() {
+        return mConnected;
+    }
+
     public void start() {
         if (btAdapter != null && btAdapter.isEnabled()) {
             DiscoveryThread discoveryThread = new DiscoveryThread();
@@ -60,10 +64,6 @@ public class BlueToothManager {
         } else {
             initBtAdapter();
         }
-    }
-
-    public boolean isIsConnected() {
-        return mIsConnected;
     }
 
     private void connect() {
@@ -78,7 +78,7 @@ public class BlueToothManager {
         if (btSocket != null) {
             try {
                 btSocket.close();
-                mIsConnected = false;
+                mConnected = false;
                 mListener.onDeviceDisconnected();
             } catch (IOException e) {
                 showError("Fatal Error", "В onPause() Не могу закрыть сокет" + e.getMessage() + ".");
@@ -128,9 +128,9 @@ public class BlueToothManager {
                     Log.d(TAG, "***Соединяемся...***");
                     mConnectThread = new ConnectedThread(btSocket);
                     btSocket.connect();
-                    mIsConnected = true;
                     Log.d(TAG, "***Соединение успешно установлено***");
                     mConnectThread.start();
+                    mConnected = true;
                     mActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -140,7 +140,7 @@ public class BlueToothManager {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                mIsConnected = false;
+                mConnected = false;
                 mActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -177,13 +177,13 @@ public class BlueToothManager {
 
             while (true) {
                 try {
-                    if (inStream.available() > 1) {
+                    if(inStream.available() > 1) {
                         bytes = inStream.read(buffer);
                         mMessageHandler.obtainMessage(ARDUINO_DATA, bytes, -1, buffer).sendToTarget();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    mIsConnected = false;
+                    mConnected = false;
                     mActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -203,7 +203,7 @@ public class BlueToothManager {
                 outStrem.write(msgBuffer);
             } catch (IOException e) {
                 e.printStackTrace();
-                mIsConnected = false;
+                mConnected = false;
                 mActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
