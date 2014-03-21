@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -39,7 +41,7 @@ public class BlueToothSyncManager extends BlueToothManager {
     }
 
     public void safeSendData(String data) {
-        if (!mSendInProgress) {
+        if (!mSendInProgress && isConnected()) {
             mSendInProgress = true;
             attemptSend(data);
         }

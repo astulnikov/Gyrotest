@@ -31,6 +31,8 @@ public class BlueToothManager {
     private BluetoothAdapter btAdapter = null;
     private BluetoothSocket btSocket = null;
 
+    private boolean mConnected;
+
     public BlueToothManager(Activity activity) {
         mActivity = activity;
         if (activity instanceof BlueToothManagerListener) {
@@ -49,6 +51,10 @@ public class BlueToothManager {
                 }
             }
         };
+    }
+
+    public boolean isConnected() {
+        return mConnected;
     }
 
     public void start() {
@@ -72,6 +78,7 @@ public class BlueToothManager {
         if (btSocket != null) {
             try {
                 btSocket.close();
+                mConnected = false;
                 mListener.onDeviceDisconnected();
             } catch (IOException e) {
                 showError("Fatal Error", "В onPause() Не могу закрыть сокет" + e.getMessage() + ".");
@@ -123,6 +130,7 @@ public class BlueToothManager {
                     btSocket.connect();
                     Log.d(TAG, "***Соединение успешно установлено***");
                     mConnectThread.start();
+                    mConnected = true;
                     mActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -132,6 +140,7 @@ public class BlueToothManager {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                mConnected = false;
                 mActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -174,6 +183,7 @@ public class BlueToothManager {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
+                    mConnected = false;
                     mActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -193,6 +203,7 @@ public class BlueToothManager {
                 outStrem.write(msgBuffer);
             } catch (IOException e) {
                 e.printStackTrace();
+                mConnected = false;
                 mActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
