@@ -187,6 +187,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     @Override
     public void onDataReceived(String data) {
         Log.d(TAG, "Data Received: " + data);
-        mArduinoDataTextView.setText("Data Received: \" + data");
+        mArduinoDataTextView.setText("Data Received: " + data);
     }
 }
