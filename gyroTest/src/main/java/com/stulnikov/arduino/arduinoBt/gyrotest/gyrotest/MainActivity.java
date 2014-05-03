@@ -28,7 +28,8 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     public static final String STEERING_SYMBOL = "s";
     public static final String DRIVE_SYMBOL = "d";
-    public static final String DRIVE_TRUE = "1";
+    public static final String DRIVE_FORWARD = "1";
+    public static final String DRIVE_BACK = "2";
     public static final String DRIVE_FALSE = "0";
 
     private BlueToothSyncManager mBlueToothManager;
@@ -154,6 +155,22 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             }
         });
 
+        Button runBackButton = (Button) findViewById(R.id.run_back_button);
+        runBackButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        setDriveBack();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        setDrive(false);
+                        break;
+                }
+                return false;
+            }
+        });
+
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
         mRetryButton = (Button) findViewById(R.id.retry);
         mRetryButton.setOnClickListener(new View.OnClickListener() {
@@ -177,6 +194,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
      * Takes angle of device rotation adn sends angle that should be applied to servo
      * e.g. average last 2 angles plus start servo point (90 deg.)
      * also applying limit to rotation (/2) to avoid wide rotation
+     *
      * @param angle angle of device
      */
     private void setAngle(int angle) {
@@ -187,8 +205,12 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     }
 
     private void setDrive(boolean isDrive) {
-        String message = DRIVE_SYMBOL + (isDrive ? DRIVE_TRUE : DRIVE_FALSE);
+        String message = DRIVE_SYMBOL + (isDrive ? DRIVE_FORWARD : DRIVE_FALSE);
         mBlueToothManager.safeSendData(message);
+    }
+
+    private void setDriveBack() {
+        mBlueToothManager.safeSendData(DRIVE_SYMBOL + DRIVE_BACK);
     }
 
     @Override

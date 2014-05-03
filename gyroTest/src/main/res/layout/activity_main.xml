@@ -107,6 +107,14 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
             android:text="@string/run"/>
+
+        <Button
+            android:id="@+id/run_back_button"
+            android:layout_width="@dimen/run_button_side"
+            android:layout_height="@dimen/run_button_side"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:text="@string/back"/>
     </RelativeLayout>
 
     <Button
