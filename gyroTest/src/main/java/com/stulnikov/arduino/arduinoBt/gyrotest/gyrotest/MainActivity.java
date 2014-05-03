@@ -24,6 +24,8 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private static final int AXIS_Y = 1;
     private static final int AXIS_Z = 2;
 
+    private static final int START_ANGLE = 90;
+
     public static final String STEERING_SYMBOL = "s";
     public static final String DRIVE_SYMBOL = "d";
     public static final String DRIVE_TRUE = "1";
@@ -171,10 +173,16 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
+    /**
+     * Takes angle of device rotation adn sends angle that should be applied to servo
+     * e.g. average last 2 angles plus start servo point (90 deg.)
+     * also applying limit to rotation (/2) to avoid wide rotation
+     * @param angle angle of device
+     */
     private void setAngle(int angle) {
         mAverageAngle = (mAverageAngle + angle) / 2;
         mAngleValueText.setText(mAverageAngle + " deg.");
-        int angleToSend = 90 + mAverageAngle;
+        int angleToSend = START_ANGLE + mAverageAngle / 2;
         mBlueToothManager.safeSendData(STEERING_SYMBOL + String.valueOf(angleToSend));
     }
 
