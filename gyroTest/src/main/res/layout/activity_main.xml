@@ -99,6 +99,14 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/angle_value"
             android:layout_centerHorizontal="true" />
+        
+        <Button
+            android:id="@+id/run_button"
+            android:layout_width="@dimen/run_button_side"
+            android:layout_height="@dimen/run_button_side"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:text="@string/run"/>
     </RelativeLayout>
 
     <Button

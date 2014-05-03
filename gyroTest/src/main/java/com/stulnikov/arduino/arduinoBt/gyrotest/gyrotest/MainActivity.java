@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -22,6 +23,9 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private static final int AXIS_X = 0;
     private static final int AXIS_Y = 1;
     private static final int AXIS_Z = 2;
+
+    public static final String STEERING_SYMBOL = "s";
+    public static final String DRIVE_SYMBOL = "d";
 
     private BlueToothSyncManager mBlueToothManager;
 
@@ -59,16 +63,12 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     @Override
     protected void onResume() {
-
         super.onResume();
-        //регистрируем сенсоры в объекты сенсора
         mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
     protected void onPause() {
-
-        //говорим что данные будем получать из этого окласса
         mSensorManager.unregisterListener(this);
         super.onPause();
     }
@@ -133,6 +133,23 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         mZValueText = (TextView) findViewById(R.id.value_z);
         mAngleValueText = (TextView) findViewById(R.id.angle_value);
         mArduinoDataTextView = (TextView) findViewById(R.id.arduino_data);
+
+        Button runButton = (Button) findViewById(R.id.run_button);
+        runButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        setDrive(true);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        setDrive(false);
+                        break;
+                }
+                return false;
+            }
+        });
+
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
         mRetryButton = (Button) findViewById(R.id.retry);
         mRetryButton.setOnClickListener(new View.OnClickListener() {
@@ -156,7 +173,12 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         mAverageAngle = (mAverageAngle + angle) / 2;
         mAngleValueText.setText(mAverageAngle + " deg.");
         int angleToSend = 90 + mAverageAngle;
-        mBlueToothManager.safeSendData(String.valueOf(angleToSend));
+        mBlueToothManager.safeSendData(STEERING_SYMBOL + String.valueOf(angleToSend));
+    }
+
+    private void setDrive(boolean isDrive) {
+        String message = DRIVE_SYMBOL + (isDrive ? "1" : "0");
+        mBlueToothManager.safeSendData(message);
     }
 
     @Override
