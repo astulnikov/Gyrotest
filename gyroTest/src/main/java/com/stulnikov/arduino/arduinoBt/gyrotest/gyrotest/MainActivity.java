@@ -26,6 +26,8 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     public static final String STEERING_SYMBOL = "s";
     public static final String DRIVE_SYMBOL = "d";
+    public static final String DRIVE_TRUE = "1";
+    public static final String DRIVE_FALSE = "0";
 
     private BlueToothSyncManager mBlueToothManager;
 
@@ -177,7 +179,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     }
 
     private void setDrive(boolean isDrive) {
-        String message = DRIVE_SYMBOL + (isDrive ? "1" : "0");
+        String message = DRIVE_SYMBOL + (isDrive ? DRIVE_TRUE : DRIVE_FALSE);
         mBlueToothManager.safeSendData(message);
     }
 
