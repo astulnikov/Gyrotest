@@ -201,7 +201,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         if(mAverageAngle != angle) {
             mAverageAngle = (mAverageAngle + angle) / 2;
             mAngleValueText.setText(mAverageAngle + " deg.");
-            int angleToSend = START_ANGLE + mAverageAngle / 2;
+            int angleToSend = START_ANGLE - (int) (mAverageAngle / 3.4f);
             mBlueToothManager.sendData(STEERING_SYMBOL + String.valueOf(angleToSend));
         }
     }
