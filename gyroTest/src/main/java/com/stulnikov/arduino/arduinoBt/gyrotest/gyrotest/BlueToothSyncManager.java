@@ -40,6 +40,12 @@ public class BlueToothSyncManager extends BlueToothManager {
         };
     }
 
+    @Override
+    protected void sendData(String data) {
+        data = CHECK_SYMBOL + data;
+        super.sendData(data);
+    }
+
     public void safeSendData(String data) {
         if (!mSendInProgress && isConnected()) {
             mSendInProgress = true;
@@ -73,7 +79,7 @@ public class BlueToothSyncManager extends BlueToothManager {
             if (!mSendInProgress && approveChar[0] != APPROVE_SYMBOL) {
                 if (!TextUtils.isEmpty(message)) {
                     mListener.onDataReceived(message);
-                    sendData(CHECK_SYMBOL + APPROVE_SYMBOL);
+//                    sendData(CHECK_SYMBOL + APPROVE_SYMBOL);
                 }
             } else {
                 if (approveChar[0] == APPROVE_SYMBOL) {

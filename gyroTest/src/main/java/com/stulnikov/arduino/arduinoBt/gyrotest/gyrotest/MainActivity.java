@@ -202,17 +202,17 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             mAverageAngle = (mAverageAngle + angle) / 2;
             mAngleValueText.setText(mAverageAngle + " deg.");
             int angleToSend = START_ANGLE + mAverageAngle / 2;
-            mBlueToothManager.safeSendData(STEERING_SYMBOL + String.valueOf(angleToSend));
+            mBlueToothManager.sendData(STEERING_SYMBOL + String.valueOf(angleToSend));
         }
     }
 
     private void setDrive(boolean isDrive) {
         String message = DRIVE_SYMBOL + (isDrive ? DRIVE_FORWARD : DRIVE_FALSE);
-        mBlueToothManager.safeSendData(message);
+        mBlueToothManager.sendData(message);
     }
 
     private void setDriveBack() {
-        mBlueToothManager.safeSendData(DRIVE_SYMBOL + DRIVE_BACK);
+        mBlueToothManager.sendData(DRIVE_SYMBOL + DRIVE_BACK);
     }
 
     @Override
