@@ -27,6 +27,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private static final int START_ANGLE = 90;
 
     public static final String STEERING_SYMBOL = "s";
+    public static final String ROBOT_SYMBOL = "r";
     public static final String DRIVE_SYMBOL = "d";
     public static final String DRIVE_FORWARD = "1";
     public static final String DRIVE_BACK = "2";
@@ -37,8 +38,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private SensorManager mSensorManager;
     private Sensor mAccelerometerSensor;
 
-    private int mAverageAngle;
-
     private TextView mXValueText;
     private TextView mYValueText;
     private TextView mZValueText;
@@ -47,6 +46,13 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private View mContentLayout;
     private ProgressBar mProgressBar;
     private Button mRetryButton;
+
+    private Button mRunButton;
+    private Button mRunBackButton;
+    private Button mRobotButton;
+
+    private int mAverageAngle;
+    private boolean mRobotMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,104 +121,6 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == BlueToothManager.REQUEST_ENABLE_BT) {
-            if (resultCode == RESULT_OK) {
-                mBlueToothManager = new BlueToothSyncManager(this);
-                mBlueToothManager.start();
-            } else {
-                onDeviceDisconnected();
-            }
-        }
-    }
-
-    private void initViews() {
-        mContentLayout = findViewById(R.id.content_layout);
-        mXValueText = (TextView) findViewById(R.id.value_x);
-        mYValueText = (TextView) findViewById(R.id.value_y);
-        mZValueText = (TextView) findViewById(R.id.value_z);
-        mAngleValueText = (TextView) findViewById(R.id.angle_value);
-        mArduinoDataTextView = (TextView) findViewById(R.id.arduino_data);
-
-        Button runButton = (Button) findViewById(R.id.run_button);
-        runButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        setDrive(true);
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        setDrive(false);
-                        break;
-                }
-                return false;
-            }
-        });
-
-        Button runBackButton = (Button) findViewById(R.id.run_back_button);
-        runBackButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        setDriveBack();
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        setDrive(false);
-                        break;
-                }
-                return false;
-            }
-        });
-
-        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
-        mRetryButton = (Button) findViewById(R.id.retry);
-        mRetryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Retry");
-                mBlueToothManager.start();
-                mRetryButton.setVisibility(View.GONE);
-                mProgressBar.setVisibility(View.VISIBLE);
-            }
-        });
-    }
-
-
-    private void initSensors() {
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-    }
-
-    /**
-     * Takes angle of device rotation adn sends angle that should be applied to servo
-     * e.g. average last 2 angles plus start servo point (90 deg.)
-     * also applying limit to rotation (/2) to avoid wide rotation
-     *
-     * @param angle angle of device
-     */
-    private void setAngle(int angle) {
-        if(mAverageAngle != angle) {
-            mAverageAngle = (mAverageAngle + angle) / 2;
-            mAngleValueText.setText(mAverageAngle + " deg.");
-            int angleToSend = START_ANGLE - (int) (mAverageAngle / 3.4f);
-            mBlueToothManager.sendData(STEERING_SYMBOL + String.valueOf(angleToSend));
-        }
-    }
-
-    private void setDrive(boolean isDrive) {
-        String message = DRIVE_SYMBOL + (isDrive ? DRIVE_FORWARD : DRIVE_FALSE);
-        mBlueToothManager.sendData(message);
-    }
-
-    private void setDriveBack() {
-        mBlueToothManager.sendData(DRIVE_SYMBOL + DRIVE_BACK);
     }
 
     @Override
@@ -244,5 +152,122 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     public void onDataReceived(String data) {
         Log.d(TAG, "Data Received: " + data);
         mArduinoDataTextView.setText("Data Received: " + data);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == BlueToothManager.REQUEST_ENABLE_BT) {
+            if (resultCode == RESULT_OK) {
+                mBlueToothManager = new BlueToothSyncManager(this);
+                mBlueToothManager.start();
+            } else {
+                onDeviceDisconnected();
+            }
+        }
+    }
+
+    private void initViews() {
+        mContentLayout = findViewById(R.id.content_layout);
+        mXValueText = (TextView) findViewById(R.id.value_x);
+        mYValueText = (TextView) findViewById(R.id.value_y);
+        mZValueText = (TextView) findViewById(R.id.value_z);
+        mAngleValueText = (TextView) findViewById(R.id.angle_value);
+        mArduinoDataTextView = (TextView) findViewById(R.id.arduino_data);
+
+        mRunButton = (Button) findViewById(R.id.run_button);
+        mRunButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        setDrive(true);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        setDrive(false);
+                        break;
+                }
+                return false;
+            }
+        });
+
+        mRunBackButton = (Button) findViewById(R.id.run_back_button);
+        mRunBackButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        setDriveBack();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        setDrive(false);
+                        break;
+                }
+                return false;
+            }
+        });
+
+        mRobotButton = (Button) findViewById(R.id.robot_button);
+        mRobotButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleRobotMode();
+            }
+        });
+
+        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        mRetryButton = (Button) findViewById(R.id.retry);
+        mRetryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Retry");
+                mBlueToothManager.start();
+                mRetryButton.setVisibility(View.GONE);
+                mProgressBar.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+
+    private void initSensors() {
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+    }
+
+    /**
+     * Takes angle of device rotation adn sends angle that should be applied to servo
+     * e.g. average last 2 angles plus start servo point (90 deg.)
+     * also applying limit to rotation (/3.4) to avoid wide rotation
+     *
+     * @param angle angle of device
+     */
+    private void setAngle(int angle) {
+        if (mAverageAngle != angle) {
+            mAverageAngle = (mAverageAngle + angle) / 2;
+            mAngleValueText.setText(mAverageAngle + " deg.");
+            int angleToSend = START_ANGLE - (int) (mAverageAngle / 3.4f);
+            mBlueToothManager.sendData(STEERING_SYMBOL + String.valueOf(angleToSend));
+        }
+    }
+
+    private void setDrive(boolean isDrive) {
+        String message = DRIVE_SYMBOL + (isDrive ? DRIVE_FORWARD : DRIVE_FALSE);
+        mBlueToothManager.sendData(message);
+    }
+
+    private void setDriveBack() {
+        mBlueToothManager.sendData(DRIVE_SYMBOL + DRIVE_BACK);
+    }
+
+    private void toggleRobotMode() {
+        mRobotMode = !mRobotMode;
+        if (mRobotMode) {
+            mSensorManager.unregisterListener(this);
+        } else {
+            mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+        mRunButton.setEnabled(!mRobotMode);
+        mRunBackButton.setEnabled(!mRobotMode);
+        mBlueToothManager.sendData(ROBOT_SYMBOL);
     }
 }

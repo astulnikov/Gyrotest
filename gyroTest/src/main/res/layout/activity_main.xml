@@ -115,6 +115,14 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentBottom="true"
             android:text="@string/back"/>
+
+        <Button
+            android:id="@+id/robot_button"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/robot_button_height"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:text="@string/robot_label"/>
     </RelativeLayout>
 
     <Button

@@ -6,5 +6,6 @@
     <string name="back">Back</string>
     <string name="action_settings">Settings</string>
     <string name="retry">Попробовать снова</string>
+    <string name="robot_label">Robot mode</string>
 
 </resources>
