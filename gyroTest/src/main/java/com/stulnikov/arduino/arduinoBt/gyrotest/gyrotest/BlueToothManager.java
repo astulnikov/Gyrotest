@@ -87,7 +87,9 @@ public class BlueToothManager {
     }
 
     protected void sendData(String data) {
-        mConnectThread.sendData(data);
+        if(isConnected()) {
+            mConnectThread.sendData(data);
+        }
     }
 
     private void initBtAdapter() {
