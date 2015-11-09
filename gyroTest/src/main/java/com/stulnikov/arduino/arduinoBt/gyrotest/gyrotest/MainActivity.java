@@ -7,7 +7,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,7 +17,7 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class MainActivity extends ActionBarActivity implements SensorEventListener, BlueToothManager.BlueToothManagerListener {
+public class MainActivity extends AppCompatActivity implements SensorEventListener, BlueToothManager.BlueToothManagerListener {
 
     public static final String TAG = "GyroTest";
     private static final int AXIS_X = 0;
@@ -29,6 +29,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     public static final String STEERING_SYMBOL = "s";
     public static final String ROBOT_SYMBOL = "r";
     public static final String DRIVE_SYMBOL = "d";
+    public static final String DRIVE_FAST_FORWARD = "3";
     public static final String DRIVE_FORWARD = "1";
     public static final String DRIVE_BACK = "2";
     public static final String DRIVE_FALSE = "0";
@@ -48,6 +49,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private Button mRetryButton;
 
     private Button mRunButton;
+    private Button mRunFastButton;
     private Button mRunBackButton;
     private Button mRobotButton;
 
@@ -191,6 +193,22 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
             }
         });
 
+        mRunFastButton = (Button) findViewById(R.id.run_fast_button);
+        mRunFastButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        setDriveFast();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        setDrive(false);
+                        break;
+                }
+                return false;
+            }
+        });
+
         mRunBackButton = (Button) findViewById(R.id.run_back_button);
         mRunBackButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -253,6 +271,10 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private void setDrive(boolean isDrive) {
         String message = DRIVE_SYMBOL + (isDrive ? DRIVE_FORWARD : DRIVE_FALSE);
         mBlueToothManager.sendData(message);
+    }
+
+    private void setDriveFast() {
+        mBlueToothManager.sendData(DRIVE_SYMBOL + DRIVE_FAST_FORWARD);
     }
 
     private void setDriveBack() {

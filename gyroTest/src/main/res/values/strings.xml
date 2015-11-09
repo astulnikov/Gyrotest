@@ -3,6 +3,7 @@
 
     <string name="app_name">Gyro test</string>
     <string name="run">Run!</string>
+    <string name="run_fast">Run Fast!</string>
     <string name="back">Back</string>
     <string name="action_settings">Settings</string>
     <string name="retry">Попробовать снова</string>
