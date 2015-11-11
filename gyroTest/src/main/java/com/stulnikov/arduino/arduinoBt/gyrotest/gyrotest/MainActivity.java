@@ -289,6 +289,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
         mRunButton.setEnabled(!mRobotMode);
+        mRunFastButton.setEnabled(!mRobotMode);
         mRunBackButton.setEnabled(!mRobotMode);
         mBlueToothManager.sendData(ROBOT_SYMBOL);
     }
