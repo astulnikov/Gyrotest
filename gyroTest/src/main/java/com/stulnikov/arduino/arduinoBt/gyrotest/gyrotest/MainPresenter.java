@@ -7,6 +7,9 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  * @author alexeystulnikov 12/25/16.
  */
@@ -14,6 +17,7 @@ import android.util.Log;
 public class MainPresenter extends BasePresenter<MainView> implements SensorEventListener {
 
     private static final String TAG = MainPresenter.class.getSimpleName();
+    private static final int SEND_MESSAGE_PERIOD = 10;
     private static final int START_ANGLE = 90;
 
     private static final String STEERING_SYMBOL = "s";
@@ -36,6 +40,9 @@ public class MainPresenter extends BasePresenter<MainView> implements SensorEven
     private int mAverageAngle;
     private boolean mRobotMode;
 
+    private Timer mTimer;
+    private RepeatSendMessageTask mSendRepeatedMessageTask;
+
     public MainPresenter() {
     }
 
@@ -55,6 +62,10 @@ public class MainPresenter extends BasePresenter<MainView> implements SensorEven
     @Override
     public void stop() {
         super.stop();
+        if (mTimer != null) {
+            mTimer.cancel();
+        }
+
         mBlueToothManager.stop();
         mSensorManager.unregisterListener(this);
     }
@@ -97,15 +108,22 @@ public class MainPresenter extends BasePresenter<MainView> implements SensorEven
 
     public void setDrive(boolean isDrive) {
         String message = DRIVE_SYMBOL + (isDrive ? DRIVE_FORWARD : DRIVE_FALSE);
-        mBlueToothManager.sendData(message);
+        if (isDrive) {
+            startSendingMessages(message);
+        } else {
+            if (mTimer != null) {
+                mTimer.cancel();
+            }
+            mBlueToothManager.sendData(message);
+        }
     }
 
     public void setDriveFast() {
-        mBlueToothManager.sendData(DRIVE_SYMBOL + DRIVE_FAST_FORWARD);
+        startSendingMessages(DRIVE_SYMBOL + DRIVE_FAST_FORWARD);
     }
 
     public void setDriveBack() {
-        mBlueToothManager.sendData(DRIVE_SYMBOL + DRIVE_BACK);
+        startSendingMessages(DRIVE_SYMBOL + DRIVE_BACK);
     }
 
     public void toggleRobotMode() {
@@ -123,5 +141,30 @@ public class MainPresenter extends BasePresenter<MainView> implements SensorEven
     private void initSensors() {
         mSensorManager = (SensorManager) getView().getActivity().getSystemService(Context.SENSOR_SERVICE);
         mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+    }
+
+    private void startSendingMessages(String message) {
+        if (mTimer != null) {
+            mTimer.cancel();
+        }
+        mTimer = new Timer();
+
+        mSendRepeatedMessageTask = new RepeatSendMessageTask(mBlueToothManager, message);
+        mTimer.schedule(mSendRepeatedMessageTask, 0, SEND_MESSAGE_PERIOD);
+    }
+
+    static class RepeatSendMessageTask extends TimerTask {
+        private String mMessage;
+        private BlueToothManager mBlueToothManager;
+
+        public RepeatSendMessageTask(BlueToothManager blueToothManager, String message) {
+            this.mMessage = message;
+            this.mBlueToothManager = blueToothManager;
+        }
+
+        @Override
+        public void run() {
+            mBlueToothManager.sendData(mMessage);
+        }
     }
 }
