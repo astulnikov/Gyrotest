@@ -45,7 +45,7 @@ public class BlueToothManager {
                     case ARDUINO_DATA:
                         byte[] readBuf = (byte[]) msg.obj;
                         String strIn = new String(readBuf, 0, msg.arg1);
-                        Log.i(TAG, "Данные от Arduino: " + strIn);
+                        Log.i(TAG, "Data from Arduino: " + strIn);
                         mListener.onDataReceived(strIn);
                         break;
                 }
@@ -81,13 +81,13 @@ public class BlueToothManager {
                 mConnected = false;
                 mListener.onDeviceDisconnected();
             } catch (IOException e) {
-                showError("Fatal Error", "В onPause() Не могу закрыть сокет" + e.getMessage() + ".");
+                showError("Fatal Error", "In onPause() Can't close socket" + e.getMessage() + ".");
             }
         }
     }
 
     protected void sendData(String data) {
-        if(isConnected()) {
+        if (isConnected()) {
             mConnectThread.sendData(data);
         }
     }
@@ -96,7 +96,7 @@ public class BlueToothManager {
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         if (btAdapter != null) {
             if (btAdapter.isEnabled()) {
-                Log.i(TAG, "Bluetooth включен. Все отлично.");
+                Log.i(TAG, "Bluetooth enabled. Fine.");
                 mListener.onBlueToothReady();
                 connect();
             } else {
@@ -104,7 +104,7 @@ public class BlueToothManager {
                 mActivity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             }
         } else {
-            showError("Fatal Error", "Bluetooth ОТСУТСТВУЕТ");
+            showError("Fatal Error", "Bluetooth MISSING");
         }
     }
 
@@ -120,17 +120,17 @@ public class BlueToothManager {
         public void run() {
             btAdapter.startDiscovery();
             BluetoothDevice device = btAdapter.getRemoteDevice(MAC_ADDRESS);
-            Log.d(TAG, "***Получили удаленный Device***" + device.getName());
+            Log.d(TAG, "***Got remote  Device***" + device.getName());
             try {
                 btSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
-                Log.d(TAG, "...Создали сокет...");
+                Log.d(TAG, "...Create socket...");
                 if (btSocket != null) {
                     btAdapter.cancelDiscovery();
-                    Log.d(TAG, "***Отменили поиск других устройств***");
-                    Log.d(TAG, "***Соединяемся...***");
+                    Log.d(TAG, "***Cancel device discovery***");
+                    Log.d(TAG, "***Connecting...***");
                     mConnectThread = new ConnectedThread(btSocket);
                     btSocket.connect();
-                    Log.d(TAG, "***Соединение успешно установлено***");
+                    Log.d(TAG, "***Connection successful***");
                     mConnectThread.start();
                     mConnected = true;
                     mActivity.runOnUiThread(new Runnable() {
@@ -179,7 +179,7 @@ public class BlueToothManager {
 
             while (true) {
                 try {
-                    if(inStream.available() > 1) {
+                    if (inStream.available() > 1) {
                         bytes = inStream.read(buffer);
                         mMessageHandler.obtainMessage(ARDUINO_DATA, bytes, -1, buffer).sendToTarget();
                     }
@@ -199,7 +199,7 @@ public class BlueToothManager {
 
         public void sendData(String message) {
             byte[] msgBuffer = message.getBytes();
-            Log.d(TAG, "***Отправляем данные: " + message + "***");
+            Log.d(TAG, "***Sending data: " + message + "***");
 
             try {
                 outStrem.write(msgBuffer);

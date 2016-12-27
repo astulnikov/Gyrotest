@@ -5,7 +5,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.util.Log;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -17,7 +16,7 @@ import java.util.TimerTask;
 public class MainPresenter extends BasePresenter<MainView> implements SensorEventListener {
 
     private static final String TAG = MainPresenter.class.getSimpleName();
-    private static final int SEND_MESSAGE_PERIOD = 10;
+    private static final int SEND_MESSAGE_PERIOD = 200;
     private static final int START_ANGLE = 90;
 
     private static final String STEERING_SYMBOL = "s";
@@ -73,8 +72,6 @@ public class MainPresenter extends BasePresenter<MainView> implements SensorEven
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        Log.i(TAG, "Sensor Type: " + event.sensor.getName());
-        Log.i(TAG, "Sensor Accuracy: " + event.accuracy);
         switch (event.sensor.getType()) {
             case Sensor.TYPE_ACCELEROMETER:
                 getView().showX(event.values[AXIS_X]);
@@ -93,15 +90,16 @@ public class MainPresenter extends BasePresenter<MainView> implements SensorEven
     /**
      * Takes angle of device rotation adn sends angle that should be applied to servo
      * e.g. average last 2 angles plus start servo point (90 deg.)
-     * also applying limit to rotation (/3.4) to avoid wide rotation
+     * also applying limit to rotation (/3.3) to avoid wide rotation
      *
      * @param angle angle of device
      */
     public void setAngle(int angle) {
-        if (mAverageAngle != angle) {
-            mAverageAngle = (mAverageAngle + angle) / 2;
+        int newAverageAngle = Math.round(((mAverageAngle + angle) / 2) / 2.8f);
+        if (mAverageAngle != newAverageAngle) {
+            mAverageAngle = newAverageAngle;
             getView().showAngle(mAverageAngle);
-            int angleToSend = START_ANGLE - (int) (mAverageAngle / 3.4f);
+            int angleToSend = START_ANGLE - mAverageAngle;
             mBlueToothManager.sendData(STEERING_SYMBOL + String.valueOf(angleToSend));
         }
     }
