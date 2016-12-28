@@ -1,10 +1,6 @@
 package com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest;
 
-import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
+import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.sensor.AccelerometerProvider;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -13,10 +9,10 @@ import java.util.TimerTask;
  * @author alexeystulnikov 12/25/16.
  */
 
-public class MainPresenter extends BasePresenter<MainView> implements SensorEventListener {
+public class MainPresenter extends BasePresenter<MainView> implements AccelerometerProvider.SensorCallback {
 
     private static final String TAG = MainPresenter.class.getSimpleName();
-    private static final int SEND_MESSAGE_PERIOD = 200;
+    private static final int SEND_MESSAGE_PERIOD = 500;
     private static final int START_ANGLE = 90;
 
     private static final String STEERING_SYMBOL = "s";
@@ -27,14 +23,8 @@ public class MainPresenter extends BasePresenter<MainView> implements SensorEven
     private static final String DRIVE_BACK = "2";
     private static final String DRIVE_FALSE = "0";
 
-    private static final int AXIS_X = 0;
-    private static final int AXIS_Y = 1;
-    private static final int AXIS_Z = 2;
-
     private BlueToothSyncManager mBlueToothManager;
-
-    private SensorManager mSensorManager;
-    private Sensor mAccelerometerSensor;
+    private AccelerometerProvider mAccelerometerProvider;
 
     private int mAverageAngle;
     private boolean mRobotMode;
@@ -52,10 +42,9 @@ public class MainPresenter extends BasePresenter<MainView> implements SensorEven
             mBlueToothManager = new BlueToothSyncManager(getView().getActivity());
         }
         mBlueToothManager.start();
-        if (mSensorManager == null) {
-            initSensors();
+        if (mAccelerometerProvider != null) {
+            mAccelerometerProvider.registerListener(this);
         }
-        mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
@@ -66,26 +55,36 @@ public class MainPresenter extends BasePresenter<MainView> implements SensorEven
         }
 
         mBlueToothManager.stop();
-        mSensorManager.unregisterListener(this);
-    }
-
-
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        switch (event.sensor.getType()) {
-            case Sensor.TYPE_ACCELEROMETER:
-                getView().showX(event.values[AXIS_X]);
-                getView().showY(event.values[AXIS_Y]);
-                getView().showZ(event.values[AXIS_Z]);
-                setAngle((int) event.values[AXIS_Y] * 10);
-                break;
+        if (mAccelerometerProvider != null) {
+            mAccelerometerProvider.unregisterListener(this);
         }
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    public void setSensorController(AccelerometerProvider provider) {
+        mAccelerometerProvider = provider;
     }
 
+    @Override
+    public void onSensorXChanged(float x) {
+        getView().showX(x);
+    }
+
+    @Override
+    public void onSensorYChanged(float y) {
+        getView().showY(y);
+        setAngle((int) y * 10);
+    }
+
+    @Override
+    public void onSensorZChanged(float z) {
+        getView().showZ(z);
+    }
+
+    @Override
+    public void onAccuracyChanged(int accuracy) {
+
+    }
 
     /**
      * Takes angle of device rotation adn sends angle that should be applied to servo
@@ -106,14 +105,7 @@ public class MainPresenter extends BasePresenter<MainView> implements SensorEven
 
     public void setDrive(boolean isDrive) {
         String message = DRIVE_SYMBOL + (isDrive ? DRIVE_FORWARD : DRIVE_FALSE);
-        if (isDrive) {
-            startSendingMessages(message);
-        } else {
-            if (mTimer != null) {
-                mTimer.cancel();
-            }
-            mBlueToothManager.sendData(message);
-        }
+        startSendingMessages(message);
     }
 
     public void setDriveFast() {
@@ -129,16 +121,15 @@ public class MainPresenter extends BasePresenter<MainView> implements SensorEven
         getView().toggleRobotMode(mRobotMode);
 
         if (mRobotMode) {
-            mSensorManager.unregisterListener(this);
+            if (mAccelerometerProvider != null) {
+                mAccelerometerProvider.registerListener(this);
+            }
         } else {
-            mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+            if (mAccelerometerProvider != null) {
+                mAccelerometerProvider.unregisterListener(this);
+            }
         }
         mBlueToothManager.sendData(ROBOT_SYMBOL);
-    }
-
-    private void initSensors() {
-        mSensorManager = (SensorManager) getView().getActivity().getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
     private void startSendingMessages(String message) {

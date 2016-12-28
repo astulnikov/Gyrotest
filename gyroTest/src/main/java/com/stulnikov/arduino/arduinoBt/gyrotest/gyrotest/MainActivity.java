@@ -13,6 +13,8 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.sensor.SensorController;
+
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements MainView,
@@ -54,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
         mContentLayout.setVisibility(View.GONE);
         mRetryButton.setVisibility(View.GONE);
         mProgressBar.setVisibility(View.VISIBLE);
+        mMainPresenter.setSensorController(new SensorController(this));
         mMainPresenter.start();
     }
 
