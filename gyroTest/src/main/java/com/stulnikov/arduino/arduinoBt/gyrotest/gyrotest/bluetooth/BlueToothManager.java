@@ -1,4 +1,4 @@
-package com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest;
+package com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.bluetooth;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
-public class BlueToothManager {
+public class BlueToothManager implements BlueToothController {
 
     public static final int REQUEST_ENABLE_BT = 1;
     private static final String TAG = "BlueToothManager";
@@ -22,10 +22,10 @@ public class BlueToothManager {
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static final String MAC_ADDRESS = "98:D3:31:B1:79:C0"; // MAC-адрес БТ модуля
 
-    protected Activity mActivity;
+    private Activity mActivity;
     protected BlueToothManagerListener mListener;
 
-    protected Handler mMessageHandler;
+    private Handler mMessageHandler;
     private ConnectedThread mConnectThread;
 
     private BluetoothAdapter btAdapter = null;
@@ -35,9 +35,6 @@ public class BlueToothManager {
 
     public BlueToothManager(Activity activity) {
         mActivity = activity;
-        if (activity instanceof BlueToothManagerListener) {
-            mListener = (BlueToothManagerListener) activity;
-        }
 
         mMessageHandler = new Handler() {
             public void handleMessage(android.os.Message msg) {
@@ -52,10 +49,16 @@ public class BlueToothManager {
         };
     }
 
+    @Override
+    public void setListener(BlueToothManagerListener listener) {
+        this.mListener = listener;
+    }
+
     public boolean isConnected() {
         return mConnected;
     }
 
+    @Override
     public void start() {
         if (btAdapter != null && btAdapter.isEnabled()) {
             DiscoveryThread discoveryThread = new DiscoveryThread();
@@ -65,11 +68,7 @@ public class BlueToothManager {
         }
     }
 
-    private void connect() {
-        DiscoveryThread discoveryThread = new DiscoveryThread();
-        discoveryThread.start();
-    }
-
+    @Override
     public void stop() {
         if (mConnectThread != null && mConnectThread.status_OutStream() != null) {
             mConnectThread.cancel();
@@ -85,7 +84,8 @@ public class BlueToothManager {
         }
     }
 
-    protected void sendData(String data) {
+    @Override
+    public void sendData(String data) {
         if (isConnected()) {
             mConnectThread.sendData(data);
         }
@@ -94,6 +94,11 @@ public class BlueToothManager {
     protected void parseMessage(String message) {
         Log.i(TAG, "Data from Arduino: " + message);
         mListener.onDataReceived(message);
+    }
+
+    private void connect() {
+        DiscoveryThread discoveryThread = new DiscoveryThread();
+        discoveryThread.start();
     }
 
     private void initBtAdapter() {
@@ -230,15 +235,5 @@ public class BlueToothManager {
         public Object status_OutStream() {
             return outStrem;
         }
-    }
-
-    interface BlueToothManagerListener {
-        public void onBlueToothReady();
-
-        public void onDeviceConnected();
-
-        public void onDeviceDisconnected();
-
-        public void onDataReceived(String data);
     }
 }

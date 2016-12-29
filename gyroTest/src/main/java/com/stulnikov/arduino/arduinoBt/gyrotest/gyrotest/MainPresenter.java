@@ -1,18 +1,16 @@
 package com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest;
 
+import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.bluetooth.BlueToothController;
+import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.bluetooth.BlueToothManager;
 import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.sensor.AccelerometerProvider;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * @author alexeystulnikov 12/25/16.
  */
 
-public class MainPresenter extends BasePresenter<MainView> implements AccelerometerProvider.SensorCallback {
+public class MainPresenter extends BasePresenter<MainView> implements AccelerometerProvider.SensorCallback,
+        BlueToothManager.BlueToothManagerListener {
 
-    private static final String TAG = MainPresenter.class.getSimpleName();
-    private static final int SEND_MESSAGE_PERIOD = 500;
     private static final int START_ANGLE = 90;
 
     private static final String STEERING_SYMBOL = "s";
@@ -23,46 +21,38 @@ public class MainPresenter extends BasePresenter<MainView> implements Accelerome
     private static final String DRIVE_BACK = "2";
     private static final String DRIVE_FALSE = "0";
 
-    private BlueToothSyncManager mBlueToothManager;
+    private BlueToothController mBlueToothController;
     private AccelerometerProvider mAccelerometerProvider;
 
     private int mAverageAngle;
     private boolean mRobotMode;
 
-    private Timer mTimer;
-    private RepeatSendMessageTask mSendRepeatedMessageTask;
-
-    public MainPresenter() {
-    }
-
     @Override
     public void start() {
-        super.start();
-        if (mBlueToothManager == null) {
-            mBlueToothManager = new BlueToothSyncManager(getView().getActivity());
-        }
-        mBlueToothManager.start();
+        mBlueToothController.start();
         if (mAccelerometerProvider != null) {
             mAccelerometerProvider.registerListener(this);
         }
+        mBlueToothController.setListener(this);
     }
 
     @Override
     public void stop() {
-        super.stop();
-        if (mTimer != null) {
-            mTimer.cancel();
-        }
-
-        mBlueToothManager.stop();
+        mBlueToothController.stop();
         if (mAccelerometerProvider != null) {
             mAccelerometerProvider.unregisterListener(this);
         }
+        mBlueToothController.setListener(null);
     }
 
     @Override
     public void setSensorController(AccelerometerProvider provider) {
         mAccelerometerProvider = provider;
+    }
+
+    @Override
+    public void setBluetoothManager(BlueToothManager manager) {
+        mBlueToothController = manager;
     }
 
     @Override
@@ -83,37 +73,38 @@ public class MainPresenter extends BasePresenter<MainView> implements Accelerome
 
     @Override
     public void onAccuracyChanged(int accuracy) {
-
     }
 
-    /**
-     * Takes angle of device rotation adn sends angle that should be applied to servo
-     * e.g. average last 2 angles plus start servo point (90 deg.)
-     * also applying limit to rotation (/3.3) to avoid wide rotation
-     *
-     * @param angle angle of device
-     */
-    public void setAngle(int angle) {
-        int newAverageAngle = Math.round(((mAverageAngle + angle) / 2) / 2.8f);
-        if (mAverageAngle != newAverageAngle) {
-            mAverageAngle = newAverageAngle;
-            getView().showAngle(mAverageAngle);
-            int angleToSend = START_ANGLE - mAverageAngle;
-            mBlueToothManager.sendData(STEERING_SYMBOL + String.valueOf(angleToSend));
-        }
+    @Override
+    public void onBlueToothReady() {
+    }
+
+    @Override
+    public void onDeviceConnected() {
+        getView().onDeviceConnected();
+    }
+
+    @Override
+    public void onDeviceDisconnected() {
+        getView().onDeviceDisconnected();
+    }
+
+    @Override
+    public void onDataReceived(String data) {
+        getView().showReceivedData(data);
     }
 
     public void setDrive(boolean isDrive) {
         String message = DRIVE_SYMBOL + (isDrive ? DRIVE_FORWARD : DRIVE_FALSE);
-        startSendingMessages(message);
+        mBlueToothController.sendData(message);
     }
 
     public void setDriveFast() {
-        startSendingMessages(DRIVE_SYMBOL + DRIVE_FAST_FORWARD);
+        mBlueToothController.sendData(DRIVE_SYMBOL + DRIVE_FAST_FORWARD);
     }
 
     public void setDriveBack() {
-        startSendingMessages(DRIVE_SYMBOL + DRIVE_BACK);
+        mBlueToothController.sendData(DRIVE_SYMBOL + DRIVE_BACK);
     }
 
     public void toggleRobotMode() {
@@ -129,31 +120,23 @@ public class MainPresenter extends BasePresenter<MainView> implements Accelerome
                 mAccelerometerProvider.unregisterListener(this);
             }
         }
-        mBlueToothManager.sendData(ROBOT_SYMBOL);
+        mBlueToothController.sendData(ROBOT_SYMBOL);
     }
 
-    private void startSendingMessages(String message) {
-        if (mTimer != null) {
-            mTimer.cancel();
-        }
-        mTimer = new Timer();
-
-        mSendRepeatedMessageTask = new RepeatSendMessageTask(mBlueToothManager, message);
-        mTimer.schedule(mSendRepeatedMessageTask, 0, SEND_MESSAGE_PERIOD);
-    }
-
-    static class RepeatSendMessageTask extends TimerTask {
-        private String mMessage;
-        private BlueToothManager mBlueToothManager;
-
-        public RepeatSendMessageTask(BlueToothManager blueToothManager, String message) {
-            this.mMessage = message;
-            this.mBlueToothManager = blueToothManager;
-        }
-
-        @Override
-        public void run() {
-            mBlueToothManager.sendData(mMessage);
+    /**
+     * Takes angle of device rotation adn sends angle that should be applied to servo
+     * e.g. average last 2 angles plus start servo point (90 deg.)
+     * also applying limit to rotation (/3.3) to avoid wide rotation
+     *
+     * @param angle angle of device
+     */
+    private void setAngle(int angle) {
+        int newAverageAngle = Math.round(((mAverageAngle + angle) / 2) / 2.8f);
+        if (mAverageAngle != newAverageAngle) {
+            mAverageAngle = newAverageAngle;
+            getView().showAngle(mAverageAngle);
+            int angleToSend = START_ANGLE - mAverageAngle;
+            mBlueToothController.sendData(STEERING_SYMBOL + String.valueOf(angleToSend));
         }
     }
 }

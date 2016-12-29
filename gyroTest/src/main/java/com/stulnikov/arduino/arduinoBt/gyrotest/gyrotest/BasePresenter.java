@@ -1,5 +1,6 @@
 package com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest;
 
+import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.bluetooth.BlueToothManager;
 import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.sensor.AccelerometerProvider;
 
 /**
@@ -7,7 +8,7 @@ import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.sensor.AccelerometerPro
  */
 
 public abstract class BasePresenter<T extends BaseView> {
-    protected T mView;
+    private T mView;
 
     public void bindView(T view) {
         mView = view;
@@ -21,13 +22,11 @@ public abstract class BasePresenter<T extends BaseView> {
         return mView;
     }
 
-    public void start() {
+    public abstract void start();
 
-    }
-
-    public void stop() {
-
-    }
+    public abstract void stop();
 
     public abstract void setSensorController(AccelerometerProvider provider);
+
+    public abstract void setBluetoothManager(BlueToothManager manager);
 }

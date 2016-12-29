@@ -1,6 +1,5 @@
 package com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,12 +12,13 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.bluetooth.BlueToothManager;
+import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.bluetooth.BlueToothSyncManager;
 import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.sensor.SensorController;
 
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements MainView,
-        BlueToothManager.BlueToothManagerListener {
+public class MainActivity extends AppCompatActivity implements MainView {
 
     public static final String TAG = "GyroTest";
 
@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements MainView,
         mContentLayout.setVisibility(View.GONE);
         mRetryButton.setVisibility(View.GONE);
         mProgressBar.setVisibility(View.VISIBLE);
+        mMainPresenter.setBluetoothManager(new BlueToothSyncManager(this));
         mMainPresenter.setSensorController(new SensorController(this));
         mMainPresenter.start();
     }
@@ -64,6 +65,12 @@ public class MainActivity extends AppCompatActivity implements MainView,
     protected void onStop() {
         super.onStop();
         mMainPresenter.stop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mMainPresenter.unbindView();
+        super.onDestroy();
     }
 
     @Override
@@ -76,12 +83,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         return id == R.id.action_settings || super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBlueToothReady() {
-        Log.d(TAG, "BlueTooth Ready");
-        mArduinoDataTextView.setText("BlueTooth Ready");
     }
 
     @Override
@@ -100,11 +101,10 @@ public class MainActivity extends AppCompatActivity implements MainView,
         mProgressBar.setVisibility(View.GONE);
         mContentLayout.setVisibility(View.GONE);
         mRetryButton.setVisibility(View.VISIBLE);
-
     }
 
     @Override
-    public void onDataReceived(String data) {
+    public void showReceivedData(String data) {
         Log.d(TAG, "Data Received: " + data);
         mArduinoDataTextView.setText("Data Received: " + data);
     }
@@ -146,11 +146,6 @@ public class MainActivity extends AppCompatActivity implements MainView,
     @Override
     public void showZ(float z) {
         mZValueText.setText(String.format(Locale.getDefault(), "%1.2f", z));
-    }
-
-    @Override
-    public Activity getActivity() {
-        return this;
     }
 
     private void initViews() {

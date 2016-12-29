@@ -1,4 +1,4 @@
-package com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest;
+package com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.bluetooth;
 
 import android.app.Activity;
 import android.text.TextUtils;
@@ -15,7 +15,7 @@ public class BlueToothSyncManager extends BlueToothManager {
     }
 
     @Override
-    protected void sendData(String data) {
+    public void sendData(String data) {
         data = CHECK_SYMBOL + data;
         super.sendData(data);
     }

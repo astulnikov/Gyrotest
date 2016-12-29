@@ -1,7 +1,5 @@
 package com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest;
 
-import android.app.Activity;
-
 /**
  * @author alexeystulnikov 12/25/16.
  */
@@ -17,5 +15,9 @@ public interface MainView extends BaseView {
 
     void showZ(float z);
 
-    Activity getActivity();
+    void showReceivedData(String data);
+
+    void onDeviceConnected();
+
+    void onDeviceDisconnected();
 }
