@@ -45,8 +45,7 @@ public class BlueToothManager {
                     case ARDUINO_DATA:
                         byte[] readBuf = (byte[]) msg.obj;
                         String strIn = new String(readBuf, 0, msg.arg1);
-                        Log.i(TAG, "Data from Arduino: " + strIn);
-                        mListener.onDataReceived(strIn);
+                        parseMessage(strIn);
                         break;
                 }
             }
@@ -90,6 +89,11 @@ public class BlueToothManager {
         if (isConnected()) {
             mConnectThread.sendData(data);
         }
+    }
+
+    protected void parseMessage(String message) {
+        Log.i(TAG, "Data from Arduino: " + message);
+        mListener.onDataReceived(message);
     }
 
     private void initBtAdapter() {
