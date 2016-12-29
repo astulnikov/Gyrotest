@@ -47,6 +47,11 @@ public class BlueToothSyncManager extends BlueToothManager {
                 }
             } else {
                 Log.i(TAG, "Approve received");
+                message = message.substring(1);
+                if (!TextUtils.isEmpty(message)) {
+                    Log.i(TAG, "Confirmation for " + message);
+                    mListener.onDataReceived(message);
+                }
             }
         }
     }
