@@ -88,25 +88,27 @@ public class MainActivity extends AppCompatActivity implements MainView {
     @Override
     public void onDeviceConnected() {
         Log.d(TAG, "Device Connected");
-        mArduinoDataTextView.setText("Device Connected");
+        mArduinoDataTextView.setText(R.string.device_connected);
         mProgressBar.setVisibility(View.GONE);
         mRetryButton.setVisibility(View.GONE);
         mContentLayout.setVisibility(View.VISIBLE);
+        mRobotButton.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onDeviceDisconnected() {
         Log.d(TAG, "Device Disconnected");
-        mArduinoDataTextView.setText("Device Disconnected");
+        mArduinoDataTextView.setText(R.string.device_disconnected);
         mProgressBar.setVisibility(View.GONE);
         mContentLayout.setVisibility(View.GONE);
+        mRobotButton.setVisibility(View.GONE);
         mRetryButton.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void showReceivedData(String data) {
         Log.d(TAG, "Data Received: " + data);
-        mArduinoDataTextView.setText("Data Received: " + data);
+        mArduinoDataTextView.setText(getString(R.string.data_received, data));
     }
 
     @Override
@@ -130,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void showAngle(float angle) {
-        mAngleValueText.setText(angle + " deg.");
+        mAngleValueText.setText(getString(R.string.angle, angle));
     }
 
     @Override

@@ -20,7 +20,7 @@ public class BlueToothManager implements BlueToothController {
     private static final String TAG = "BlueToothManager";
     private static final int ARDUINO_DATA = 1;
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    private static final String MAC_ADDRESS = "98:D3:31:B1:79:C0"; // MAC-адрес БТ модуля
+    private static final String MAC_ADDRESS = "98:D3:31:B1:79:C0"; // BT module MAC-address
 
     private Activity mActivity;
     protected BlueToothManagerListener mListener;
@@ -119,7 +119,7 @@ public class BlueToothManager implements BlueToothController {
 
     private void showError(String title, String message) {
         Log.e(TAG, message);
-        Toast.makeText(mActivity, title + " - " + message + ". Завершение.", Toast.LENGTH_LONG).show();
+        Toast.makeText(mActivity, title + " - " + message + ". Finishing.", Toast.LENGTH_LONG).show();
         mActivity.finish();
     }
 
