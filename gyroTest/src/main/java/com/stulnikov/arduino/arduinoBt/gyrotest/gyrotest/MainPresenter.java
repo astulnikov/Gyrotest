@@ -1,7 +1,6 @@
 package com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest;
 
-import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.bluetooth.BlueToothController;
-import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.bluetooth.BlueToothManager;
+import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.bluetooth.BluetoothController;
 import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.sensor.AccelerometerProvider;
 
 /**
@@ -9,7 +8,7 @@ import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.sensor.AccelerometerPro
  */
 
 public class MainPresenter extends BasePresenter<MainView> implements AccelerometerProvider.SensorCallback,
-        BlueToothManager.BlueToothManagerListener {
+        BluetoothController.BlueToothManagerListener {
 
     private static final int START_ANGLE = 90;
 
@@ -21,7 +20,7 @@ public class MainPresenter extends BasePresenter<MainView> implements Accelerome
     private static final String DRIVE_BACK = "2";
     private static final String DRIVE_FALSE = "0";
 
-    private BlueToothController mBlueToothController;
+    private BluetoothController mBlueToothController;
     private AccelerometerProvider mAccelerometerProvider;
 
     private int mAverageAngle;
@@ -51,8 +50,8 @@ public class MainPresenter extends BasePresenter<MainView> implements Accelerome
     }
 
     @Override
-    public void setBluetoothManager(BlueToothManager manager) {
-        mBlueToothController = manager;
+    public void setBluetoothManager(BluetoothController controller) {
+        mBlueToothController = controller;
     }
 
     @Override
@@ -73,6 +72,16 @@ public class MainPresenter extends BasePresenter<MainView> implements Accelerome
 
     @Override
     public void onAccuracyChanged(int accuracy) {
+    }
+
+    @Override
+    public void onBluetoothMissing() {
+        getView().onDeviceDisconnected();
+    }
+
+    @Override
+    public void onBluetoothDisabled() {
+        getView().showEnableBluetooth();
     }
 
     @Override

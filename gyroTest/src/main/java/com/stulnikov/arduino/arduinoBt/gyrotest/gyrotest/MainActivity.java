@@ -1,8 +1,10 @@
 package com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,8 +14,7 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.bluetooth.BlueToothManager;
-import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.bluetooth.BlueToothSyncManager;
+import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.bluetooth.Bluetooth;
 import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.sensor.SensorController;
 
 import java.util.Locale;
@@ -21,6 +22,7 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity implements MainView {
 
     public static final String TAG = "GyroTest";
+    public static final int REQUEST_ENABLE_BT = 1;
 
     private MainPresenter mMainPresenter;
 
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
         mContentLayout.setVisibility(View.GONE);
         mRetryButton.setVisibility(View.GONE);
         mProgressBar.setVisibility(View.VISIBLE);
-        mMainPresenter.setBluetoothManager(new BlueToothSyncManager(this));
+        mMainPresenter.setBluetoothManager(new Bluetooth());
         mMainPresenter.setSensorController(new SensorController(this));
         mMainPresenter.start();
     }
@@ -108,13 +110,21 @@ public class MainActivity extends AppCompatActivity implements MainView {
     @Override
     public void showReceivedData(String data) {
         Log.d(TAG, "Data Received: " + data);
-        mArduinoDataTextView.setText(getString(R.string.data_received, data));
+        if (!TextUtils.isEmpty(data)) {
+            mArduinoDataTextView.setText(getString(R.string.data_received, data));
+        }
+    }
+
+    @Override
+    public void showEnableBluetooth() {
+        Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+        startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == BlueToothManager.REQUEST_ENABLE_BT) {
+        if (requestCode == REQUEST_ENABLE_BT) {
             if (resultCode == RESULT_OK) {
                 mMainPresenter.start();
             } else {

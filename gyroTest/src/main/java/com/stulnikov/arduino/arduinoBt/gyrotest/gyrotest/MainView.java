@@ -20,4 +20,6 @@ public interface MainView extends BaseView {
     void onDeviceConnected();
 
     void onDeviceDisconnected();
+
+    void showEnableBluetooth();
 }

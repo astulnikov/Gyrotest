@@ -1,4 +1,15 @@
+buildscript {
+    repositories {
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+
+    dependencies {
+        classpath 'me.tatarka:gradle-retrolambda:3.4.0'
+    }
+}
+
 apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 25
@@ -6,10 +17,16 @@ android {
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 22
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -20,4 +37,7 @@ android {
 
 dependencies {
     compile 'com.android.support:appcompat-v7:25.1.0'
+    compile 'io.reactivex:rxjava:1.2.2'
+    compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'com.jakewharton.timber:timber:4.4.0'
 }
