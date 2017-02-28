@@ -2,7 +2,7 @@
 
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.3'
@@ -11,6 +11,10 @@ buildscript {
 
 allprojects {
     repositories {
-        mavenCentral()
+        jcenter()
     }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = project.GRADLE_VERSION
 }
