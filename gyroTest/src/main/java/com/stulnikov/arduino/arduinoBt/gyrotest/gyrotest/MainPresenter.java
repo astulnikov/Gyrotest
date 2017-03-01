@@ -3,6 +3,8 @@ package com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest;
 import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.bluetooth.BluetoothController;
 import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.sensor.AccelerometerProvider;
 
+import javax.inject.Inject;
+
 /**
  * @author alexeystulnikov 12/25/16.
  */
@@ -21,10 +23,17 @@ public class MainPresenter extends BasePresenter<MainView> implements Accelerome
     private static final String DRIVE_FALSE = "0";
 
     private BluetoothController mBlueToothController;
+
     private AccelerometerProvider mAccelerometerProvider;
 
     private int mAverageAngle;
     private boolean mRobotMode;
+
+    @Inject
+    public MainPresenter(AccelerometerProvider accelerometer, BluetoothController bluetoothController) {
+        mAccelerometerProvider = accelerometer;
+        mBlueToothController = bluetoothController;
+    }
 
     @Override
     public void start() {

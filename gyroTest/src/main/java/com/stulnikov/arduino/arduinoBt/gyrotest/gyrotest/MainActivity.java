@@ -14,17 +14,19 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.bluetooth.Bluetooth;
-import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.sensor.SensorController;
+import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.dagger.DaggerPresenterComponent;
 
 import java.util.Locale;
+
+import javax.inject.Inject;
 
 public class MainActivity extends AppCompatActivity implements MainView {
 
     public static final String TAG = "GyroTest";
     public static final int REQUEST_ENABLE_BT = 1;
 
-    private MainPresenter mMainPresenter;
+    @Inject
+    public MainPresenter mMainPresenter;
 
     private TextView mXValueText;
     private TextView mYValueText;
@@ -47,7 +49,10 @@ public class MainActivity extends AppCompatActivity implements MainView {
         setContentView(R.layout.activity_main);
         initViews();
         if (mMainPresenter == null) {
-            mMainPresenter = new MainPresenter();
+            DaggerPresenterComponent
+                    .builder()
+                    .applicationComponent(((GyroTestApp) getApplication()).getApplicationComponent())
+                    .build().inject(this);
         }
         mMainPresenter.bindView(this);
     }
@@ -58,8 +63,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
         mContentLayout.setVisibility(View.GONE);
         mRetryButton.setVisibility(View.GONE);
         mProgressBar.setVisibility(View.VISIBLE);
-        mMainPresenter.setBluetoothManager(new Bluetooth());
-        mMainPresenter.setSensorController(new SensorController(this));
         mMainPresenter.start();
     }
 
