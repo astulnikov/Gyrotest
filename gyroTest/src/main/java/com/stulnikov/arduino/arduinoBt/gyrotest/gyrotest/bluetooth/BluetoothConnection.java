@@ -232,7 +232,7 @@ public class BluetoothConnection {
                 mSocket.close();
             }
         } catch (IOException e) {
-            Timber.e("Fail to sendData data", e);
+            Timber.e(e, "Fail to sendData data");
         }
     }
 }

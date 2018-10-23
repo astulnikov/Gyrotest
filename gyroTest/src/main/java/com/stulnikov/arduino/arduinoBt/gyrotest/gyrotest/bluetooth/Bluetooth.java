@@ -72,7 +72,7 @@ public class Bluetooth implements BluetoothController {
                     });
                     mBluetoothConnection.subscribeToInputData(sendObservable);
                 }, throwable -> {
-                    Timber.e(throwable, "Error occurred %s", throwable);
+                    Timber.e(throwable, "Error occurred %s", throwable.toString());
                     if (mListener != null) {
                         if (throwable instanceof BluetoothMissingException) {
                             mListener.onBluetoothMissing();
