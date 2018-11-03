@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.stulnikov.arduino.arduinoBt.gyrotest.gyrotest.dagger.DaggerPresenterComponent;
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
     private Button mRetryButton;
 
     private Button mRunButton;
-    private Button mRunFastButton;
+    private SeekBar mRunProgress;
     private Button mRunBackButton;
     private Button mRobotButton;
 
@@ -139,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
     @Override
     public void toggleRobotMode(boolean robotMode) {
         mRunButton.setEnabled(!robotMode);
-        mRunFastButton.setEnabled(!robotMode);
+        mRunProgress.setEnabled(!robotMode);
         mRunBackButton.setEnabled(!robotMode);
     }
 
@@ -187,13 +188,17 @@ public class MainActivity extends AppCompatActivity implements MainView {
             }
         });
 
-        mRunFastButton = (Button) findViewById(R.id.run_fast_button);
-        mRunFastButton.setOnTouchListener(new View.OnTouchListener() {
+        mRunProgress = findViewById(R.id.run_progress);
+        mRunProgress.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                Log.d(TAG, "Action" + event.getAction());
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        mMainPresenter.setDriveFast();
+                        // Do nothing
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        mMainPresenter.setDrivePercent(mRunProgress.getProgress());
                         break;
                     case MotionEvent.ACTION_UP:
                         mMainPresenter.setDrive(false);

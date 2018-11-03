@@ -18,9 +18,12 @@ public class MainPresenter extends BasePresenter<MainView> implements Accelerome
     private static final String ROBOT_SYMBOL = "r";
     private static final String DRIVE_SYMBOL = "d";
     private static final String DRIVE_FAST_FORWARD = "3";
+    private static final String RUN_FORWARD_PERCENT_SYMBOL = "4";
     private static final String DRIVE_FORWARD = "1";
     private static final String DRIVE_BACK = "2";
     private static final String DRIVE_FALSE = "0";
+
+    public static final int SEND_THRESHOLD = 50;
 
     private BluetoothController mBlueToothController;
 
@@ -28,6 +31,9 @@ public class MainPresenter extends BasePresenter<MainView> implements Accelerome
 
     private int mAverageAngle;
     private boolean mRobotMode;
+
+    private long mLastAngleSentTimestamp;
+    private long mLastPowerSentTimestamp;
 
     @Inject
     public MainPresenter(AccelerometerProvider accelerometer, BluetoothController bluetoothController) {
@@ -117,8 +123,11 @@ public class MainPresenter extends BasePresenter<MainView> implements Accelerome
         mBlueToothController.sendData(message);
     }
 
-    public void setDriveFast() {
-        mBlueToothController.sendData(DRIVE_SYMBOL + DRIVE_FAST_FORWARD);
+    public void setDrivePercent(int percent) {
+        if (System.currentTimeMillis() - mLastPowerSentTimestamp > SEND_THRESHOLD) {
+            mBlueToothController.sendData(DRIVE_SYMBOL + RUN_FORWARD_PERCENT_SYMBOL + percent);
+            mLastPowerSentTimestamp = System.currentTimeMillis();
+        }
     }
 
     public void setDriveBack() {
@@ -150,11 +159,14 @@ public class MainPresenter extends BasePresenter<MainView> implements Accelerome
      */
     private void setAngle(int angle) {
         int newAverageAngle = Math.round(((mAverageAngle + angle) / 2) / 2.8f);
-        if (mAverageAngle != newAverageAngle) {
-            mAverageAngle = newAverageAngle;
-            getView().showAngle(mAverageAngle);
-            int angleToSend = START_ANGLE - mAverageAngle;
-            mBlueToothController.sendData(STEERING_SYMBOL + String.valueOf(angleToSend));
+        if (System.currentTimeMillis() - mLastAngleSentTimestamp > SEND_THRESHOLD) {
+            if (mAverageAngle != newAverageAngle) {
+                mAverageAngle = newAverageAngle;
+                getView().showAngle(mAverageAngle);
+                int angleToSend = START_ANGLE - mAverageAngle;
+                mBlueToothController.sendData(STEERING_SYMBOL + String.valueOf(angleToSend));
+            }
+            mLastAngleSentTimestamp = System.currentTimeMillis();
         }
     }
 }
