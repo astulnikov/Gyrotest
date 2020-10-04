@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Gyrotest.iml" filepath="$PROJECT_DIR$/Gyrotest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/gyroTest/gyroTest.iml" filepath="$PROJECT_DIR$/gyroTest/gyroTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Gyrotest.iml" filepath="$PROJECT_DIR$/Gyrotest.iml" group="Gyrotest" />
+      <module fileurl="file://$PROJECT_DIR$/gyroTest/gyroTest.iml" filepath="$PROJECT_DIR$/gyroTest/gyroTest.iml" group="Gyrotest/gyroTest" />
     </modules>
   </component>
 </project>

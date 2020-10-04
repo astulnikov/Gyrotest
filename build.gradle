@@ -6,7 +6,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.0-alpha02'
+        classpath 'com.android.tools.build:gradle:4.0.1'
     }
 }
 
@@ -15,8 +15,4 @@ allprojects {
         google()
         jcenter()
     }
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = project.GRADLE_VERSION
 }
