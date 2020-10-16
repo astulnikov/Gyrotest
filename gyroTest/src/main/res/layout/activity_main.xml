@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <TableLayout
             android:id="@+id/TableLayout01"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
@@ -28,7 +28,7 @@
                     android:id="@+id/label_x"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="right"
+                    android:gravity="start"
                     android:text="X:" />
 
                 <TextView
@@ -37,7 +37,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dip"
                     android:layout_weight="1"
-                    android:text="-" />
+                    android:text="-"
+                    android:layout_marginStart="5dip" />
             </TableRow>
 
             <TableRow
@@ -50,16 +51,17 @@
                     android:id="@+id/label_y"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="right"
+                    android:gravity="start"
                     android:text="Y:" />
 
                 <TextView
                     android:id="@+id/value_y"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dip"
+                    android:layout_marginStart="5dip"
                     android:layout_weight="1"
-                    android:text="-" />
+                    android:text="-"
+                    android:layout_marginLeft="5dip" />
             </TableRow>
 
             <TableRow
@@ -72,16 +74,17 @@
                     android:id="@+id/label_z"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="right"
+                    android:gravity="start"
                     android:text="Z:" />
 
                 <TextView
                     android:id="@+id/value_z"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dip"
+                    android:layout_marginStart="5dip"
                     android:layout_weight="1"
-                    android:text="-" />
+                    android:text="-"
+                    android:layout_marginLeft="5dip" />
             </TableRow>
         </TableLayout>
 
@@ -104,20 +107,22 @@
             android:layout_width="@dimen/progress_button_height"
             android:layout_height="@dimen/progress_button_height"
             android:layout_above="@+id/run_button"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:max="100"
             android:paddingTop="50dp"
             android:rotation="270"
-            android:text="@string/run_fast" />
+            android:text="@string/run_fast"
+            android:layout_alignParentRight="true" />
 
         <Button
             android:id="@+id/run_button"
-            android:layout_marginTop="50dp"
             android:layout_width="@dimen/run_button_side"
             android:layout_height="@dimen/run_button_side"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:text="@string/run" />
+            android:layout_marginTop="50dp"
+            android:text="@string/run"
+            android:layout_alignParentRight="true" />
 
         <Button
             android:id="@+id/run_back_button"
@@ -125,7 +130,8 @@
             android:layout_height="@dimen/run_button_side"
             android:layout_alignParentLeft="true"
             android:layout_alignParentBottom="true"
-            android:text="@string/back" />
+            android:text="@string/back"
+            android:layout_alignParentStart="true" />
 
         <Button
             android:id="@+id/robot_button"
