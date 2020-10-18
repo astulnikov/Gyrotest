@@ -157,6 +157,14 @@ class MainActivity : AppCompatActivity(), MainView {
         }
     }
 
+    override fun showFrontDistance(level: Int) {
+        front_distance.setImageLevel(level)
+    }
+
+    override fun showRearDistance(level: Int) {
+        rear_distance.setImageLevel(level)
+    }
+
     companion object {
         const val REQUEST_ENABLE_BT = 1
     }

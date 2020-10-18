@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="sensor_free">#48E44E</color>
+    <color name="sensor_obstacle">#C32626</color>
+</resources>

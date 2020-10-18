@@ -72,7 +72,7 @@ class BluetoothImpl : BluetoothController {
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe({ data: String ->
-                                listener?.onDataReceived(data)
+                                listener?.onDataReceived(data.trim())
                             }, { throwable: Throwable? ->
                                 Timber.e(throwable, "Error occurred")
                                 listener?.onDeviceDisconnected()

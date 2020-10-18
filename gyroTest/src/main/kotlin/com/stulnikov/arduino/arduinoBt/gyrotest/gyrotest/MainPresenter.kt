@@ -79,8 +79,30 @@ class MainPresenter @Inject constructor(
     }
 
     override fun onDataReceived(data: String) {
-        view?.showReceivedData(data)
+        if (data.startsWith(CHECK_SYMBOL)) {
+            val payload = data.substring(1)
+            when {
+                payload.startsWith("F:") -> {
+                    val frontDistance = payload.filter { it.isDigit() }.toInt()
+                    view?.showFrontDistance(mapDistance(frontDistance))
+                }
+                payload.startsWith("R:") -> {
+                    val rearDistance = payload.filter { it.isDigit() }.toInt()
+                    view?.showRearDistance(mapDistance(rearDistance))
+                }
+            }
+        } else {
+            view?.showReceivedData(data)
+        }
     }
+
+    private fun mapDistance(distance: Int): Int =
+            when (distance) {
+                in 0..25 -> DISTANCE_LEVEL_0
+                in 26..50 -> DISTANCE_LEVEL_1
+                in 51..100 -> DISTANCE_LEVEL_2
+                else -> DISTANCE_LEVEL_3
+            }
 
     fun setDrive(isDrive: Boolean) {
         val message = DRIVE_SYMBOL + if (isDrive) DRIVE_FORWARD else DRIVE_FALSE
@@ -137,6 +159,7 @@ class MainPresenter @Inject constructor(
 
     companion object {
         private const val START_ANGLE = 90
+        private const val CHECK_SYMBOL = "c"
         private const val STEERING_SYMBOL = "s"
         private const val ROBOT_SYMBOL = "r"
         private const val DRIVE_SYMBOL = "d"
@@ -147,5 +170,10 @@ class MainPresenter @Inject constructor(
         private const val DRIVE_FALSE = "0"
         const val SEND_THRESHOLD = 50
         const val POWER_THRESHOLD = 3
+
+        private const val DISTANCE_LEVEL_0 = 0
+        private const val DISTANCE_LEVEL_1 = 1
+        private const val DISTANCE_LEVEL_2 = 2
+        private const val DISTANCE_LEVEL_3 = 3
     }
 }

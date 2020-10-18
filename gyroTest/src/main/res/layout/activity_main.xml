@@ -13,6 +13,24 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <ImageView
+            android:id="@+id/front_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/front_distance" />
+
+        <ImageView
+            android:id="@+id/rear_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/front_distance"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="24dp"
+            android:rotation="180"
+            android:src="@drawable/front_distance" />
+
         <TableLayout
             android:id="@+id/TableLayout01"
             android:layout_width="fill_parent"
@@ -35,10 +53,10 @@
                     android:id="@+id/value_x"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="5dip"
                     android:layout_marginLeft="5dip"
                     android:layout_weight="1"
-                    android:text="-"
-                    android:layout_marginStart="5dip" />
+                    android:text="-" />
             </TableRow>
 
             <TableRow
@@ -59,9 +77,9 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dip"
+                    android:layout_marginLeft="5dip"
                     android:layout_weight="1"
-                    android:text="-"
-                    android:layout_marginLeft="5dip" />
+                    android:text="-" />
             </TableRow>
 
             <TableRow
@@ -82,9 +100,9 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dip"
+                    android:layout_marginLeft="5dip"
                     android:layout_weight="1"
-                    android:text="-"
-                    android:layout_marginLeft="5dip" />
+                    android:text="-" />
             </TableRow>
         </TableLayout>
 
@@ -108,30 +126,30 @@
             android:layout_height="@dimen/progress_button_height"
             android:layout_above="@+id/run_button"
             android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
             android:max="100"
             android:paddingTop="50dp"
             android:rotation="270"
-            android:text="@string/run_fast"
-            android:layout_alignParentRight="true" />
+            android:text="@string/run_fast" />
 
         <Button
             android:id="@+id/run_button"
             android:layout_width="@dimen/run_button_side"
             android:layout_height="@dimen/run_button_side"
             android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
             android:layout_marginTop="50dp"
-            android:text="@string/run"
-            android:layout_alignParentRight="true" />
+            android:text="@string/run" />
 
         <Button
             android:id="@+id/run_back_button"
             android:layout_width="@dimen/run_button_side"
             android:layout_height="@dimen/run_button_side"
+            android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentBottom="true"
-            android:text="@string/back"
-            android:layout_alignParentStart="true" />
+            android:text="@string/back" />
 
         <Button
             android:id="@+id/robot_button"

@@ -13,4 +13,6 @@ interface MainView : BaseView {
     fun onDeviceConnected()
     fun onDeviceDisconnected()
     fun showEnableBluetooth()
+    fun showFrontDistance(level: Int)
+    fun showRearDistance(level: Int)
 }
